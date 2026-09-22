@@ -17,17 +17,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Baloo+Da+2:wght@400;500;600;700&family=Tiro+Bangla&family=Atma:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script>
-  // শুধু Firestore-এর পরিচিত deprecation নোটিশটা কনসোলে লুকানোর জন্য (কোনো ফাংশনালিটি পরিবর্তন হয় না, সিঙ্ক আগের মতোই কাজ করবে)
-  (function(){
-    var origWarn = console.warn.bind(console);
-    console.warn = function(){
-      var msg = arguments && arguments[0] ? String(arguments[0]) : '';
-      if(msg.indexOf('enableMultiTabIndexedDbPersistence') !== -1) return;
-      origWarn.apply(console, arguments);
-    };
-  })();
-</script>
 <script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-app-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-auth-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-firestore-compat.js"></script>
@@ -119,11 +108,6 @@
   .today-hero .add-task-row{padding:.6rem .9rem .9rem;}
   .today-hero .add-task-row input{font-size:1rem;}
   .today-hero .day-foot{padding:.7rem .9rem 1rem;}
-  .today-note{margin:.2rem .9rem .7rem;}
-  .today-note label{display:flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:600;color:var(--ink-soft);margin-bottom:.35rem;}
-  .today-note textarea{width:100%;min-height:4.2rem;resize:vertical;border:1px solid var(--line);border-radius:.6rem;background:var(--green-pale);color:var(--ink);font-family:var(--font);font-size:.85rem;padding:.55rem .65rem;line-height:1.5;}
-  .today-note textarea:focus{outline:none;border-color:var(--green-mid);}
-  .today-note textarea::placeholder{color:var(--ink-soft);opacity:.7;}
   .today-hero .foot-row{font-size:.85rem;}
 
   .stack-panel-group{display:grid;grid-template-columns:1fr;gap:.85rem;}
@@ -378,6 +362,11 @@
 
   /* ===== v2: expense / medicine / reports / date bar ===== */
   .day-foot.with-exp{display:flex;align-items:center;gap:.8rem;}
+  .today-note{padding:.55rem .7rem .8rem;border-top:1px dashed var(--line);}
+  .today-note-label{font-size:.72rem;color:var(--ink-soft);margin-bottom:.35rem;display:flex;align-items:center;gap:.3rem;}
+  .today-note textarea{width:100%;min-height:2.4rem;max-height:9rem;resize:vertical;border:1px solid var(--line);border-radius:.6rem;background:var(--panel);color:var(--ink);font-family:var(--font);font-size:.82rem;padding:.5rem .6rem;line-height:1.5;}
+  .today-note textarea:focus{outline:none;border-color:var(--green-mid);}
+  .today-note textarea::placeholder{color:var(--ink-soft);}
   .foot-rows{flex:1;min-width:0;}
   .exp-open{flex-shrink:0;border:1px solid var(--gold);background:transparent;color:var(--ink);border-radius:.6rem;padding:.45rem .7rem;font-family:var(--font);font-size:.8rem;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:.1rem;line-height:1.3;}
   .exp-open:hover{background:var(--green-pale);}
@@ -1220,13 +1209,14 @@
     if(!dayStore[iso]){
       let raw=null;
       try{ raw = localStorage.getItem(DAY_PREFIX+iso); }catch(e){}
-      if(raw){ try{ dayStore[iso]=JSON.parse(raw); }catch(e){ dayStore[iso]={tasks:[],metrics:{}}; } }
-      else { dayStore[iso]={tasks:[],metrics:{}}; }
+      if(raw){ try{ dayStore[iso]=JSON.parse(raw); }catch(e){ dayStore[iso]={tasks:[],metrics:{},note:''}; } }
+      else { dayStore[iso]={tasks:[],metrics:{},note:''}; }
       if(!dayStore[iso].metrics) dayStore[iso].metrics={};
+      if(typeof dayStore[iso].note!=='string') dayStore[iso].note='';
     }
     return dayStore[iso];
   }
-  function saveDay(iso){ try{ localStorage.setItem(DAY_PREFIX+iso, JSON.stringify(dayStore[iso])); }catch(e){} pushToCloud('days', iso, dayStore[iso]); }
+  function saveDay(iso){ try{ localStorage.setItem(DAY_PREFIX+iso, JSON.stringify(dayStore[iso])); }catch(e){} pushToCloud('days', iso, dayStore[iso]); if(iso===todayISO()) scheduleCapResync(); }
 
   function loadWeekMeta(){
     let raw=null;
@@ -1466,10 +1456,6 @@
       <div class="today-body">
         <ul class="tasks" data-iso="${iso}">${taskListHTML(iso, tasks, true)}</ul>
         <div class="add-task-row"><input type="text" enterkeyhint="done" placeholder="+ আজকের জন্য নতুন কাজ" data-iso="${iso}"></div>
-        <div class="today-note">
-          <label>📝 নোট</label>
-          <textarea id="todayNoteInput" enterkeyhint="done" placeholder="আজকের জন্য কিছু লিখে রাখুন...">${esc(day.note||'')}</textarea>
-        </div>
         <div class="day-foot with-exp">
           <div class="foot-rows">
           <div class="foot-row"><span>🏆 সম্পন্ন</span><div class="foot-bar"><div class="foot-bar-fill" style="width:${pct}%"></div></div><span>${done}/${total}</span></div>
@@ -1477,11 +1463,24 @@
           </div>
           <button type="button" class="exp-open" id="expOpenBtn">💸 ডেইলি এক্সপেন্স<span class="exp-total">${expToday>0?esc(fmtMoney(expToday)):''}</span></button>
         </div>
+        <div class="today-note">
+          <div class="today-note-label">📝 আজকের নোট</div>
+          <textarea id="todayNoteInput" placeholder="আজকের জন্য কিছু লিখে রাখুন...">${esc(day.note||'')}</textarea>
+        </div>
       </div>`;
 
     const ul = host.querySelector('.tasks');
     wireTaskList(ul);
     wireAddInput(host.querySelector('.add-task-row input'), iso);
+    const noteEl = document.getElementById('todayNoteInput');
+    if(noteEl){
+      let noteTimer=null;
+      noteEl.addEventListener('input',()=>{
+        clearTimeout(noteTimer);
+        noteTimer = setTimeout(()=>{ const d=getDay(iso); d.note=noteEl.value; saveDay(iso); }, 400);
+      });
+      noteEl.addEventListener('blur',()=>{ clearTimeout(noteTimer); const d=getDay(iso); d.note=noteEl.value; saveDay(iso); });
+    }
     function wireMetric(id, key){
       document.getElementById(id).addEventListener('input',(e)=>{
         const d = getDay(iso); if(!d.metrics) d.metrics={}; d.metrics[key]=e.target.value; saveDay(iso);
@@ -1491,9 +1490,6 @@
     wireMetric('mFocus','focus');
     wireMetric('mEnergy','energy');
     wireMetric('mSatisfaction','satisfaction');
-    document.getElementById('todayNoteInput').addEventListener('input',(e)=>{
-      const d = getDay(iso); d.note = e.target.value; saveDay(iso);
-    });
     host.querySelectorAll('.rem-buy').forEach(b=>b.addEventListener('click',()=>openMedBuy(b.dataset.pid)));
     const expBtn = host.querySelector('#expOpenBtn'); if(expBtn) expBtn.addEventListener('click', openExp);
     applyBoxSize(host, 'todayHero');
@@ -2321,7 +2317,7 @@
     salat = Object.assign({list:[], notif:{}}, d||{});
     if(!Array.isArray(salat.list)) salat.list=[];
   }
-  function saveSalat(){ try{ localStorage.setItem(SALAT_KEY, JSON.stringify(salat)); }catch(e){} pushToCloud('meta','salat',salat); }
+  function saveSalat(){ try{ localStorage.setItem(SALAT_KEY, JSON.stringify(salat)); }catch(e){} pushToCloud('meta','salat',salat); scheduleCapResync(); }
   function readJSON(k){ try{ const r=localStorage.getItem(k); return r?JSON.parse(r):null; }catch(e){ return null; } }
   function num(v){ const n=parseFloat(v); return isFinite(n)?n:0; }
   function todayISO(){ return toISO(new Date()); }
@@ -2376,6 +2372,7 @@
   function setNotifPrefs(scope, p){
     if(scope==='salat'){ salat.notif = p; saveSalat(); }
     else { settings.notifTask = p; saveSettings(); taskCfgSig = JSON.stringify(getNotifPrefs('task')); }
+    scheduleCapResync();
   }
 
   // ---------- সাউন্ড ফাইল (IndexedDB — শুধু এই ডিভাইসে থাকে) ----------
@@ -2449,6 +2446,133 @@
     }catch(e){}
     try{ new Notification(title, opts); return true; }catch(e){}
     return false;
+  }
+
+  // ---------- ডিভাইস (Capacitor/Android APK) নোটিফিকেশন সাপোর্ট ----------
+  // ওয়েবে/PC-তে সাইটের Notification API যথেষ্ট, কিন্তু Capacitor দিয়ে বানানো APK-তে
+  // অ্যাপ বন্ধ/মিনিমাইজ থাকলে সাধারণ setInterval + Notification API কাজ করে না।
+  // তাই অ্যাপ Capacitor-এর ভেতরে চললে (window.Capacitor থাকলে) OS-লেভেলে
+  // "Local Notification" শিডিউল করা হয়, যা অ্যাপ বন্ধ থাকলেও সঠিক সময়ে বেজে ওঠে।
+  //
+  // সেটআপ (একবারই, Android প্রজেক্টে): 
+  //   npm install @capacitor/local-notifications
+  //   npx cap sync android
+  // Android 13+ এ নোটিফিকেশনের জন্য রানটাইম পারমিশন লাগবে — নিচের কোড সেটা নিজে থেকেই
+  // চাইবে (ensureCapacitorPermission)। প্লাগইন ইনস্টল না থাকলেও এই কোড নিরাপদে
+  // চুপচাপ কিছু না করে থেমে যাবে (try/catch), ওয়েব ভার্সনে কোনো প্রভাব পড়বে না।
+  const isCapacitor = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform==='function' && window.Capacitor.isNativePlatform());
+  const LN = (isCapacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) ? window.Capacitor.Plugins.LocalNotifications : null;
+  const CAP_NOTIF_IDS_KEY = 'wt_cap_notif_ids';
+  function hashId(str){
+    let h = 0;
+    for(let i=0;i<str.length;i++){ h = (h*31 + str.charCodeAt(i)) | 0; }
+    h = Math.abs(h) % 2000000000;
+    return h || 1;
+  }
+  async function ensureCapacitorPermission(){
+    if(!LN) return;
+    try{
+      const cur = await LN.checkPermissions();
+      if(cur && cur.display!=='granted'){ await LN.requestPermissions(); }
+    }catch(e){}
+  }
+  // Android 8+ এ প্রতিটা নোটিফিকেশনের জন্য একটা "চ্যানেল" লাগে (হাই ইম্পর্টেন্স +
+  // সাউন্ড সহ), নাহলে কিছু ডিভাইসে নোটিফিকেশন নিঃশব্দে/দেরিতে আসে বা পপ-আপ হয় না।
+  // একবার তৈরি হয়ে গেলে বারবার কল করলেও সমস্যা নেই (নিরাপদে চুপচাপ থেমে যায়)।
+  let notifChannelReady = false;
+  async function ensureNotifChannel(){
+    if(!LN || !LN.createChannel || notifChannelReady) return;
+    try{
+      await LN.createChannel({
+        id: 'reminders',
+        name: 'Reminders',
+        description: 'কাজ ও সালাতের সময়-নির্ধারিত নোটিফিকেশন',
+        importance: 5,   // High — heads-up পপ-আপ + সাউন্ড
+        visibility: 1,
+        sound: 'default'
+      });
+      notifChannelReady = true;
+    }catch(e){}
+  }
+  let capResyncTimer = null;
+  function scheduleCapResync(){
+    if(!LN) return;
+    clearTimeout(capResyncTimer);
+    capResyncTimer = setTimeout(syncCapacitorNotifications, 700);
+  }
+  // আজকের সময়-নির্ধারিত কাজ ও প্রতিদিনের সালাতের সময়গুলো OS-এ নতুন করে শিডিউল করে
+  // (আগের শিডিউল বাতিল করে, যাতে ডুপ্লিকেট বা পুরনো সময় থেকে না যায়)
+  async function syncCapacitorNotifications(){
+    if(!LN) return;
+    try{
+      await ensureNotifChannel();
+      let prevIds = [];
+      try{ prevIds = JSON.parse(localStorage.getItem(CAP_NOTIF_IDS_KEY)||'[]'); }catch(e){}
+      if(Array.isArray(prevIds) && prevIds.length){
+        try{ await LN.cancel({ notifications: prevIds.map(id=>({id})) }); }catch(e){}
+      }
+
+      const toSchedule = [];
+      const iso = todayISO();
+      const now = new Date();
+
+      const tp = getNotifPrefs('task');
+      if(tp.enabled){
+        getDay(iso).tasks.forEach(t=>{
+          if(!t.time || t.done || !(t.text||'').trim()) return;
+          const at = dueDate(iso, t.time);
+          if(at <= now) return; // আগে চলে যাওয়া সময়, ওয়েব শিডিউলার/গ্রেস ইতিমধ্যে সামলায়
+          toSchedule.push({
+            id: hashId('task|'+iso+'|'+(t.id||t.text)),
+            title: t.text,
+            body: 'কাজের সময় হয়েছে · '+t.time,
+            schedule: { at },
+            smallIcon: 'ic_stat_icon',
+            channelId: 'reminders',
+            extra: { kind:'task', iso, tid: t.id||'' }
+          });
+        });
+      }
+
+      const sp = getNotifPrefs('salat');
+      if(sp.enabled){
+        salat.list.forEach(s=>{
+          if(!s.time || s.off) return;
+          const parts = s.time.split(':');
+          const hh = parseInt(parts[0],10), mm = parseInt(parts[1],10);
+          if(!isFinite(hh) || !isFinite(mm)) return;
+          toSchedule.push({
+            id: hashId('salat|'+s.id),
+            title: s.name+'-এর সময় হয়েছে',
+            body: 'এখন '+s.name+' · '+s.time,
+            schedule: { on:{ hour:hh, minute:mm }, allowWhileIdle:true },
+            smallIcon: 'ic_stat_icon',
+            channelId: 'reminders',
+            extra: { kind:'salat', sid: s.id }
+          });
+        });
+      }
+
+      if(toSchedule.length){ await LN.schedule({ notifications: toSchedule }); }
+      try{ localStorage.setItem(CAP_NOTIF_IDS_KEY, JSON.stringify(toSchedule.map(n=>n.id))); }catch(e){}
+    }catch(e){}
+  }
+  function initCapacitorNotifications(){
+    if(!LN) return;
+    ensureCapacitorPermission().then(syncCapacitorNotifications);
+    try{
+      LN.addListener('localNotificationActionPerformed', (ev)=>{
+        try{
+          const extra = ev && ev.notification && ev.notification.extra;
+          if(extra && extra.kind==='task' && extra.tid){
+            const day = getDay(extra.iso||todayISO());
+            const t = day.tasks.find(x=>x.id===extra.tid);
+            // অ্যাপ খুলে দেখানোর জন্য শুধু ফোকাস করা, নিজে থেকে "সম্পন্ন" মার্ক করা হয় না
+            if(t){ renderAll(); }
+          }
+        }catch(e){}
+      });
+    }catch(e){}
   }
 
   // ---------- রিং (ফাইল / বিল্ট-ইন বিপ) ----------
@@ -3348,9 +3472,11 @@
   refreshPermUI();
   registerSW();
   startScheduler();
+  initCapacitorNotifications();
   setInterval(()=>{
     renderTodayHero();
     if(viewMode==='week') renderDays(); else renderMonthGrid();
+    scheduleCapResync();
   }, 60000);
 })();
 </script>
