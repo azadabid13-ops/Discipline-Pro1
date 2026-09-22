@@ -17,6 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Baloo+Da+2:wght@400;500;600;700&family=Tiro+Bangla&family=Atma:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  // শুধু Firestore-এর পরিচিত deprecation নোটিশটা কনসোলে লুকানোর জন্য (কোনো ফাংশনালিটি পরিবর্তন হয় না, সিঙ্ক আগের মতোই কাজ করবে)
+  (function(){
+    var origWarn = console.warn.bind(console);
+    console.warn = function(){
+      var msg = arguments && arguments[0] ? String(arguments[0]) : '';
+      if(msg.indexOf('enableMultiTabIndexedDbPersistence') !== -1) return;
+      origWarn.apply(console, arguments);
+    };
+  })();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-app-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-auth-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-firestore-compat.js"></script>
@@ -108,6 +119,11 @@
   .today-hero .add-task-row{padding:.6rem .9rem .9rem;}
   .today-hero .add-task-row input{font-size:1rem;}
   .today-hero .day-foot{padding:.7rem .9rem 1rem;}
+  .today-note{margin:.2rem .9rem .7rem;}
+  .today-note label{display:flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:600;color:var(--ink-soft);margin-bottom:.35rem;}
+  .today-note textarea{width:100%;min-height:4.2rem;resize:vertical;border:1px solid var(--line);border-radius:.6rem;background:var(--green-pale);color:var(--ink);font-family:var(--font);font-size:.85rem;padding:.55rem .65rem;line-height:1.5;}
+  .today-note textarea:focus{outline:none;border-color:var(--green-mid);}
+  .today-note textarea::placeholder{color:var(--ink-soft);opacity:.7;}
   .today-hero .foot-row{font-size:.85rem;}
 
   .stack-panel-group{display:grid;grid-template-columns:1fr;gap:.85rem;}
@@ -1450,6 +1466,10 @@
       <div class="today-body">
         <ul class="tasks" data-iso="${iso}">${taskListHTML(iso, tasks, true)}</ul>
         <div class="add-task-row"><input type="text" enterkeyhint="done" placeholder="+ আজকের জন্য নতুন কাজ" data-iso="${iso}"></div>
+        <div class="today-note">
+          <label>📝 নোট</label>
+          <textarea id="todayNoteInput" enterkeyhint="done" placeholder="আজকের জন্য কিছু লিখে রাখুন...">${esc(day.note||'')}</textarea>
+        </div>
         <div class="day-foot with-exp">
           <div class="foot-rows">
           <div class="foot-row"><span>🏆 সম্পন্ন</span><div class="foot-bar"><div class="foot-bar-fill" style="width:${pct}%"></div></div><span>${done}/${total}</span></div>
@@ -1471,6 +1491,9 @@
     wireMetric('mFocus','focus');
     wireMetric('mEnergy','energy');
     wireMetric('mSatisfaction','satisfaction');
+    document.getElementById('todayNoteInput').addEventListener('input',(e)=>{
+      const d = getDay(iso); d.note = e.target.value; saveDay(iso);
+    });
     host.querySelectorAll('.rem-buy').forEach(b=>b.addEventListener('click',()=>openMedBuy(b.dataset.pid)));
     const expBtn = host.querySelector('#expOpenBtn'); if(expBtn) expBtn.addEventListener('click', openExp);
     applyBoxSize(host, 'todayHero');
