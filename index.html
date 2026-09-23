@@ -20,6 +20,7 @@
 <script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-app-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-auth-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
 <style>
   :root{
     --bg:#EFEFE8; --panel:#FFFFFF; --ink:#20301F; --ink-soft:#5E6B57; --line:#E1E4D8;
@@ -440,6 +441,9 @@
   #printArea table{border-collapse:collapse;width:100%;font-size:11px;}
   #printArea th,#printArea td{border:1px solid #999;padding:3px 5px;}
   #printArea ul{margin:2px 0 8px;padding-left:18px;font-size:12px;}
+  #printArea.capturing{left:0;top:0;z-index:1;}
+  .pdf-loading{position:fixed;inset:0;background:rgba(20,25,15,0.75);color:#fff;display:none;align-items:center;justify-content:center;z-index:300;font-family:var(--font);font-size:1rem;text-align:center;padding:1.2rem;}
+  .pdf-loading.show{display:flex;}
   @media print{
     body > *:not(#printArea){display:none !important;}
     .overlay,.drawer{display:none !important;}
@@ -920,6 +924,7 @@
 </div>
 
 <div id="printArea"></div>
+<div class="pdf-loading" id="pdfLoading">📄 PDF তৈরি হচ্ছে...<br><span style="font-size:.8rem;opacity:.8;">একটু অপেক্ষা করুন</span></div>
 
 <script>
 (function(){
@@ -1953,17 +1958,35 @@
     html += '<table><tr><th>মাস</th><th>সম্পন্ন</th><th>%</th><th>মাসের গোল</th></tr>'+rows+'</table>';
     return html;
   }
+  function downloadPdfFile(html, filename){
+    const area = document.getElementById('printArea');
+    const loading = document.getElementById('pdfLoading');
+    area.innerHTML = html;
+    area.classList.add('capturing');
+    if(loading) loading.classList.add('show');
+    const opt = {
+      margin: 8,
+      filename: filename,
+      image: {type:'jpeg', quality:0.95},
+      html2canvas: {scale:2, useCORS:true},
+      jsPDF: {unit:'mm', format:'a4', orientation:'portrait'}
+    };
+    const finish = ()=>{ area.classList.remove('capturing'); if(loading) loading.classList.remove('show'); };
+    if(typeof html2pdf==='undefined'){
+      finish();
+      setTimeout(()=>window.print(), 60);
+      return;
+    }
+    html2pdf().set(opt).from(area).save().then(finish).catch(()=>{ finish(); setTimeout(()=>window.print(),60); });
+  }
   document.getElementById('weekReportBtn').addEventListener('click',()=>{
-    document.getElementById('printArea').innerHTML = buildWeekReportHTML();
-    setTimeout(()=>window.print(), 60);
+    downloadPdfFile(buildWeekReportHTML(), 'saptahik-report.pdf');
   });
   document.getElementById('monthReportBtn').addEventListener('click',()=>{
-    document.getElementById('printArea').innerHTML = buildMonthReportHTML();
-    setTimeout(()=>window.print(), 60);
+    downloadPdfFile(buildMonthReportHTML(), 'mashik-report.pdf');
   });
   document.getElementById('yearReportBtn').addEventListener('click',()=>{
-    document.getElementById('printArea').innerHTML = buildYearReportHTML();
-    setTimeout(()=>window.print(), 60);
+    downloadPdfFile(buildYearReportHTML(), 'barshik-report.pdf');
   });
 
   // ===================== SETTINGS / CUSTOMIZATION =====================
@@ -3330,7 +3353,7 @@
   })();
 
   // ---------- রিপোর্ট (খরচ ও বাজার লিস্ট) ----------
-  function printReport(html){ $('printArea').innerHTML = html; setTimeout(()=>window.print(), 80); }
+  function printReport(html, filename){ downloadPdfFile(html, filename || 'report.pdf'); }
   function groupsScreenHTML(groups){
     if(!groups.length) return '<div class="empty-note" style="padding:1.2rem .3rem;">এই সময়ে কোনো তথ্য নেই।</div>';
     return groups.map(g=>`<div class="rp-group"><div class="rp-head"><span>${esc(g.title)}</span><span>${esc(fmtMoney(g.total))}</span></div>${g.rows.map(r=>`<div class="rp-row"><span class="rp-a">${esc(r.a)}</span>${r.b!=null?`<span class="rp-b">${esc(r.b)}</span>`:''}<span class="rp-c">${esc(r.c)}</span></div>`).join('')}</div>`).join('');
@@ -3390,7 +3413,7 @@
       const d = expGroups();
       const titles = {day:'দৈনিক', week:'সাপ্তাহিক', month:'মাসিক'};
       const extra = er.mode==='day' ? '' : 'দৈনিক গড় খরচ: '+fmtMoney(d.total/d.days);
-      printReport(reportPrintHTML(titles[er.mode]+' খরচ রিপোর্ট', d.label, d.groups, d.total, ['বিবরণ','টাকা'], extra));
+      printReport(reportPrintHTML(titles[er.mode]+' খরচ রিপোর্ট', d.label, d.groups, d.total, ['বিবরণ','টাকা'], extra), 'kharoch-report.pdf');
     });
     $('expReportBtn').addEventListener('click', openExpReport);
   })();
@@ -3426,7 +3449,7 @@
       const d = listGroups();
       let label = 'সব সময়';
       if(lr.month!=='all'){ const p=lr.month.split('-').map(Number); label = MONTH_NAMES[p[1]-1]+' '+p[0]; }
-      printReport(reportPrintHTML('বাজার লিস্ট রিপোর্ট', label, d.groups, d.total, ['পণ্য','পরিমাণ','দাম'], 'মোট '+d.groups.length+' দিনের লিস্ট'));
+      printReport(reportPrintHTML('বাজার লিস্ট রিপোর্ট', label, d.groups, d.total, ['পণ্য','পরিমাণ','দাম'], 'মোট '+d.groups.length+' দিনের লিস্ট'), 'bazar-report.pdf');
     });
   })();
 
