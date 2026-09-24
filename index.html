@@ -442,6 +442,55 @@
   #printArea th,#printArea td{border:1px solid #999;padding:3px 5px;}
   #printArea ul{margin:2px 0 8px;padding-left:18px;font-size:12px;}
   #printArea.capturing{left:0;top:0;z-index:1;}
+  /* PDF শীট: html2pdf এটাকে ক্লোন করে নিজের কন্টেইনারে বসায়। আগে #printArea (position:fixed;left:-9999px)
+     ক্লোন হয়ে যেত, ফলে কন্টেইনারের উচ্চতা ০ হয়ে PDF ফাঁকা আসত। এখন id/fixed ছাড়া আলাদা শীট ব্যবহার হয়। */
+  .pdf-sheet{position:static;width:760px;box-sizing:border-box;background:#fff;color:#000;font-family:'Hind Siliguri','Noto Sans Bengali',sans-serif;padding:20px;line-height:1.45;}
+  .pdf-sheet *{color:inherit;}
+  .pdf-sheet h1{font-size:20px;margin:0 0 4px;}
+  .pdf-sheet h2{font-size:15px;margin:16px 0 6px;}
+  .pdf-sheet h3{font-size:13px;margin:10px 0 4px;}
+  .pdf-sheet p{margin:4px 0;}
+  .pdf-sheet table{border-collapse:collapse;width:100%;font-size:11px;}
+  .pdf-sheet th,.pdf-sheet td{border:1px solid #999;padding:3px 5px;}
+  .pdf-sheet ul{margin:2px 0 8px;padding-left:18px;font-size:12px;}
+
+  /* ===== নতুন PDF ডিজাইন (পেজ-ভিত্তিক, কোনো অংশ কাটা পড়ে না) ===== */
+  .pdf-page{width:210mm;height:297mm;box-sizing:border-box;padding:30px 34px 52px;position:relative;overflow:hidden;background:#fff;color:#1f2a20;font-family:'Hind Siliguri','Noto Sans Bengali',sans-serif;line-height:1.5;font-size:12px;}
+  .pdf-page-body{display:flow-root;}
+  .pdf-foot{position:absolute;left:34px;right:34px;bottom:20px;display:flex;justify-content:space-between;font-size:10px;color:#7a857b;border-top:1px solid #d9dfd6;padding-top:6px;}
+  .pdf-page-body h1{font-size:22px;margin:0 0 4px;color:#2f5236;}
+  .pdf-page-body h2{font-size:16px;margin:16px 0 6px;color:#2f5236;border-bottom:2px solid #dbe6d8;padding-bottom:3px;}
+  .pdf-page-body h3{font-size:13.5px;margin:12px 0 4px;color:#2f5236;}
+  .pdf-page-body p{margin:4px 0;}
+  .pdf-page-body ul{margin:2px 0 8px;padding-left:20px;font-size:12px;}
+  .pdf-page-body li{margin:1px 0;}
+  .pdf-page-body table{border-collapse:collapse;width:100%;font-size:12px;margin:0 0 10px;}
+  .pdf-page-body th{background:#3E6B44;color:#fff;border:1px solid #3E6B44;padding:5px 7px;text-align:left;font-weight:600;}
+  .pdf-page-body td{border:1px solid #cfd8cc;padding:4px 7px;vertical-align:top;}
+  .pdf-page-body tbody tr:nth-child(even) td{background:#f6f9f5;}
+  .pdf-page-body .r{text-align:right;}
+  .pdf-page-body .c{text-align:center;}
+  .pdf-page-body .nw{white-space:nowrap;}
+  .pdf-page-body th.r{text-align:right;}
+  .pdf-page-body th.c{text-align:center;}
+  .pdf-page-body tr.pdf-total td{background:#e2ecdf;font-weight:700;border-top:2px solid #3E6B44;color:#2f5236;}
+  .pdf-page-body tr.pdf-cat td{background:#eef3ec;font-weight:700;color:#2f5236;}
+  .pdf-page-body .ok{color:#2e7d32;font-weight:600;}
+  .pdf-page-body .no{color:#8a6d1f;}
+  .pdf-hero{background:#3E6B44;color:#fff;border-radius:10px;padding:16px 20px;margin-bottom:12px;}
+  .pdf-hero .t{font-size:22px;font-weight:700;}
+  .pdf-hero .l{font-size:14px;margin-top:2px;}
+  .pdf-hero .g{font-size:10.5px;margin-top:6px;color:#dbe8d8;}
+  .pdf-cards{display:flex;gap:10px;margin:0 0 12px;}
+  .pdf-card{flex:1;border:1px solid #cfd8cc;border-radius:8px;padding:8px 10px;background:#f6f9f5;}
+  .pdf-card .k{font-size:10.5px;color:#66756a;}
+  .pdf-card .v{font-size:17px;font-weight:700;color:#2f5236;}
+  .pdf-card .s{font-size:10px;color:#66756a;}
+  .pdf-sec-head{display:flex;justify-content:space-between;gap:8px;background:#e2ecdf;border-left:4px solid #3E6B44;padding:5px 10px;margin:12px 0 0;font-weight:700;font-size:13px;color:#2f5236;}
+  .pdf-sec-head.cont{margin-top:0;}
+  .pdf-sub{font-size:13px;font-weight:700;color:#2f5236;margin:10px 0 4px;}
+  .pdf-grand{display:flex;justify-content:space-between;background:#3E6B44;color:#fff;border-radius:8px;padding:10px 16px;font-size:16px;font-weight:700;margin-top:12px;}
+  .pdf-note{padding:14px;border:1px dashed #b7c4b3;border-radius:8px;color:#66756a;text-align:center;}
   .pdf-loading{position:fixed;inset:0;background:rgba(20,25,15,0.75);color:#fff;display:none;align-items:center;justify-content:center;z-index:300;font-family:var(--font);font-size:1rem;text-align:center;padding:1.2rem;}
   .pdf-loading.show{display:flex;}
   @media print{
@@ -839,6 +888,7 @@
     <div class="date-bar"><span>📅 তারিখ</span><input type="date" id="blDate"><button class="ghost-btn" type="button" id="blToday">আজ</button></div>
     <div class="bl-progress" id="blProgress"></div>
     <div class="sheet-body" id="blBody"></div>
+    <div class="dl-row" style="padding:.4rem .9rem 0;"><button class="ghost-btn" type="button" id="blDatePdf">📄 এই তারিখের বাজার রিপোর্ট (PDF)</button></div>
     <div class="sheet-foot">
       <button class="ghost-btn" type="button" id="blAddMore">➕ আইটেম যোগ</button>
       <div class="foot-actions">
@@ -856,6 +906,7 @@
       <button class="drawer-close" type="button" data-close="listRepSheet">✕</button>
     </div>
     <div class="date-bar"><span>🗓 সময়</span><select id="lrMonth"></select><span class="grow"></span><b id="lrTotal"></b></div>
+    <div class="date-bar"><span>📅 নির্দিষ্ট দিন</span><select id="lrDay"></select></div>
     <div class="sheet-body" id="lrBody"></div>
     <div class="sheet-foot">
       <span style="font-size:.78rem;color:var(--ink-soft);">প্রতিটি তারিখের লিস্ট ও দাম এখানে সেভ থাকে।</span>
@@ -878,6 +929,7 @@
       <button type="button" id="expAddBtn">যোগ</button>
     </div>
     <div class="salat-hint" id="expHint" style="padding:0 .9rem;"></div>
+    <div class="dl-row" style="padding:.2rem .9rem .5rem;"><button class="ghost-btn" type="button" id="expDatePdf">📄 এই তারিখের খরচ রিপোর্ট (PDF)</button></div>
     <div class="sheet-foot">
       <button class="ghost-btn" type="button" id="expReportOpen">📊 খরচ রিপোর্ট</button>
       <button class="action-btn" type="button" id="expDone">✓ সম্পন্ন</button>
@@ -1190,6 +1242,112 @@
     return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear();
   }
   function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // ---------- Capacitor (Android APK) ফাইল সেভ/ডাউনলোড হেল্পার ----------
+  // ওয়েবে/ব্রাউজারে <a download> ঠিকভাবে কাজ করে, কিন্তু Capacitor দিয়ে বানানো
+  // APK-এর WebView-তে সেই ট্রিকটা প্রায়ই কাজ করে না (কিছুই হয় না, বা ফাইল খুঁজে
+  // পাওয়া যায় না)। তাই APK-তে চললে ফাইলটা প্রথমে ডিভাইসের স্টোরেজে
+  // (@capacitor/filesystem দিয়ে) সেভ করা হয়, তারপর সম্ভব হলে নেটিভ Share শিট
+  // (@capacitor/share) খোলা হয় যাতে ইউজার Downloads/Drive/Files-এ সেভ করতে পারে।
+  const isCapacitor = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform==='function' && window.Capacitor.isNativePlatform());
+  const CapFS = (isCapacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem) ? window.Capacitor.Plugins.Filesystem : null;
+  const CapShare = (isCapacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Share) ? window.Capacitor.Plugins.Share : null;
+  function blobToBase64(blob){
+    return new Promise((resolve, reject)=>{
+      const reader = new FileReader();
+      reader.onloadend = ()=>{
+        const res = String(reader.result||'');
+        const comma = res.indexOf(',');
+        resolve(comma>=0 ? res.slice(comma+1) : res);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+  // ফাইলটা সেভ করে (সম্ভব হলে) নেটিভ শেয়ার শিট খোলে। ব্রাউজারে থাকলে সাধারণ ডাউনলোড লিংক ব্যবহার করে।
+  async function saveOrShareBlob(blob, filename, opts){
+    opts = opts || {};
+
+    // Android/Capacitor APK:
+    // 1) আগে Documents-এ সরাসরি সেভ করার চেষ্টা।
+    // 2) Android-এর scoped-storage/permission-এর কারণে সেটা ব্যর্থ হলে Cache-এ লিখে
+    //    native Share sheet খুলে "Files/Downloads/Drive" ইত্যাদিতে Save করার সুযোগ।
+    // 3) Native plugin-ও কাজ না করলে WebView/browser download-এ fallback।
+    if(isCapacitor){
+      const base64 = await blobToBase64(blob);
+
+      if(CapFS){
+        const locations = [
+          {dir:'DOCUMENTS', label:'অ্যাপের Documents ফোল্ডার'},
+          {dir:'CACHE', label:'অস্থায়ী ফাইল (Share থেকে Save করা যাবে)'}
+        ];
+
+        for(const loc of locations){
+          try{
+            await CapFS.writeFile({
+              path: filename,
+              data: base64,
+              directory: loc.dir
+            });
+
+            // Share plugin থাকলে Android-এর native share/save sheet খুলে দিই।
+            if(CapShare){
+              try{
+                const uriRes = await CapFS.getUri({ path: filename, directory: loc.dir });
+                await CapShare.share({
+                  title: filename,
+                  url: uriRes.uri,
+                  dialogTitle: opts.shareTitle || 'PDF সেভ/শেয়ার করুন'
+                });
+                return {ok:true, shared:true, locationLabel:loc.label};
+              }catch(shareErr){
+                console.warn('Native Share unavailable/cancelled:', shareErr);
+              }
+            }
+
+            // Share plugin না থাকলেও Filesystem-এ লেখা সফল হলে ফাইল তৈরি হয়েছে।
+            return {ok:true, shared:false, locationLabel:loc.label};
+          }catch(e){
+            console.warn('Capacitor file save failed in '+loc.dir+':', e);
+          }
+        }
+      }
+    }
+
+    // শেষ fallback: WebView/PWA/browser download.
+    // কিছু Android WebView-তে <a download> কাজ না করলে blob URL নতুন ট্যাবে খোলার চেষ্টা করি।
+    try{
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.rel = 'noopener';
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      // Android WebView-তে download attribute ignore হলে PDF viewer/open action-এর fallback।
+      setTimeout(()=>{
+        try{
+          const w = window.open(url, '_blank');
+          if(!w) location.href = url;
+        }catch(e){
+          try{ location.href = url; }catch(ignore){}
+        }
+      }, 350);
+
+      setTimeout(()=>URL.revokeObjectURL(url), 15000);
+      return {
+        ok:true,
+        shared:false,
+        locationLabel:'ডাউনলোড/শেয়ার শিট'
+      };
+    }catch(e){
+      console.error('ফাইল ডাউনলোড fallback ব্যর্থ:', e);
+      return {ok:false, error:e};
+    }
+  }
   function taskTimeClass(iso, t){
     if(!t.time) return '';
     if(t.done) return '';
@@ -1785,7 +1943,7 @@
   });
 
   // ---------- export / import ----------
-  document.getElementById('exportBtn').addEventListener('click',()=>{
+  document.getElementById('exportBtn').addEventListener('click',async ()=>{
     try{
       const all = { habits: JSON.parse(localStorage.getItem(HABITS_KEY)||'[]'), settings: JSON.parse(localStorage.getItem(SETTINGS_KEY)||'null'), salat: JSON.parse(localStorage.getItem(SALAT_KEY)||'null'), bazar: JSON.parse(localStorage.getItem(BAZAR_KEY)||'null'), meds: JSON.parse(localStorage.getItem(MEDS_KEY)||'null'), extra:{}, days:{}, weekMeta:{} };
       for(let i=0;i<localStorage.length;i++){
@@ -1795,10 +1953,8 @@
       else if(k && (k.indexOf(EXP_PREFIX)===0 || k.indexOf(BZ_PREFIX)===0)){ all.extra[k] = JSON.parse(localStorage.getItem(k)); }
       }
       const blob = new Blob([JSON.stringify(all,null,2)],{type:'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href=url; a.download='weekly-tracker-backup.json';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const res = await saveOrShareBlob(blob, 'weekly-tracker-backup.json', {shareTitle:'ব্যাকআপ সেভ/শেয়ার করুন', mimeType:'application/json'});
+      if(isCapacitor){ alert(res.ok ? (res.shared ? 'ব্যাকআপ তৈরি হয়েছে — সেভ/শেয়ার করুন' : 'ব্যাকআপ সেভ হয়েছে: '+res.locationLabel) : 'এক্সপোর্ট ব্যর্থ হয়েছে।'); }
     }catch(e){ alert('এক্সপোর্ট ব্যর্থ হয়েছে।'); }
   });
   document.getElementById('importInput').addEventListener('change',(e)=>{
@@ -1958,26 +2114,176 @@
     html += '<table><tr><th>মাস</th><th>সম্পন্ন</th><th>%</th><th>মাসের গোল</th></tr>'+rows+'</table>';
     return html;
   }
+  // ---------- PDF পেজ তৈরি (প্রতিটি পেজ আলাদা A4 — টেবিল/লিস্ট পেজের শেষে নিজে থেকে ভাগ হয়, কিছু কাটা পড়ে না) ----------
+  async function pdfMakePages(html, docTitle){
+    try{ if(document.fonts && document.fonts.ready) await document.fonts.ready; }catch(e){}
+    const BH = 1036; // এক পেজের ব্যবহারযোগ্য উচ্চতা (px)
+    const stage = document.createElement('div');
+    stage.style.cssText = 'position:fixed;left:0;top:0;width:794px;z-index:-1;pointer-events:none;background:#fff;';
+    document.body.appendChild(stage);
+    const pages = []; let body = null;
+    const newPage = ()=>{
+      const pg = document.createElement('div'); pg.className = 'pdf-page';
+      body = document.createElement('div'); body.className = 'pdf-page-body';
+      pg.appendChild(body); stage.appendChild(pg); pages.push(pg);
+    };
+    const over = ()=> body.offsetHeight > BH;
+    const room = ()=> BH - body.offsetHeight;
+    const put = (el)=>{
+      body.appendChild(el);
+      if(over() && body.children.length>1){ body.removeChild(el); newPage(); body.appendChild(el); }
+    };
+    const putTable = (tbl, head)=>{
+      const rows = Array.from(tbl.querySelectorAll('tr'));
+      const headRow = (rows.length && rows[0].querySelector('th')) ? rows.shift() : null;
+      const mk = ()=>{
+        const t = tbl.cloneNode(false); const tb = document.createElement('tbody');
+        if(headRow){ const th = document.createElement('thead'); th.appendChild(headRow.cloneNode(true)); t.appendChild(th); }
+        t.appendChild(tb); return {t:t, tb:tb};
+      };
+      let cur = mk(); body.appendChild(cur.t); let placed = 0;
+      rows.forEach(r=>{
+        cur.tb.appendChild(r);
+        if(over() && placed>0){
+          cur.tb.removeChild(r);
+          newPage();
+          if(head){ const h = head.cloneNode(true); h.classList.add('cont'); const s = h.querySelector('.h-t'); if(s) s.textContent += ' (চলমান)'; body.appendChild(h); }
+          cur = mk(); body.appendChild(cur.t); cur.tb.appendChild(r); placed = 0;
+        }
+        placed++;
+      });
+    };
+    const putList = (ul)=>{
+      const items = Array.from(ul.children);
+      const mk = ()=>{ const u = ul.cloneNode(false); body.appendChild(u); return u; };
+      let cur = mk(); let placed = 0;
+      items.forEach(li=>{
+        cur.appendChild(li);
+        if(over() && placed>0){
+          cur.removeChild(li); newPage(); cur = mk(); cur.appendChild(li); placed = 0;
+        }
+        placed++;
+      });
+    };
+    const src = document.createElement('div'); src.innerHTML = html;
+    const kids = Array.from(src.children);
+    newPage();
+    let lastHead = null;
+    kids.forEach(el=>{
+      const tag = el.tagName;
+      if(tag==='H2' || tag==='H3' || el.classList.contains('pdf-sec-head') || el.classList.contains('pdf-sub')){
+        if(room() < 120 && body.children.length>0) newPage();
+        put(el); lastHead = el.classList.contains('pdf-sec-head') ? el : null; return;
+      }
+      if(tag==='TABLE'){ putTable(el, lastHead); lastHead = null; return; }
+      if(tag==='UL'){ putList(el); lastHead = null; return; }
+      lastHead = null; put(el);
+    });
+    const n = pages.length;
+    pages.forEach((pg,i)=>{
+      const f = document.createElement('div'); f.className = 'pdf-foot';
+      f.innerHTML = '<span>'+esc(docTitle||'')+'</span><span>পৃষ্ঠা '+(i+1)+' / '+n+'</span>';
+      pg.appendChild(f);
+    });
+    pages.forEach(pg=>{ if(pg.parentNode) pg.parentNode.removeChild(pg); });
+    if(stage.parentNode) stage.parentNode.removeChild(stage);
+    return pages;
+  }
+  const PDF_LOADING_DEFAULT_HTML = '📄 PDF তৈরি হচ্ছে...<br><span style="font-size:.8rem;opacity:.8;">একটু অপেক্ষা করুন</span>';
   function downloadPdfFile(html, filename){
     const area = document.getElementById('printArea');
     const loading = document.getElementById('pdfLoading');
-    area.innerHTML = html;
-    area.classList.add('capturing');
-    if(loading) loading.classList.add('show');
-    const opt = {
-      margin: 8,
+    if(loading){ loading.innerHTML = PDF_LOADING_DEFAULT_HTML; loading.classList.add('show'); }
+    const finish = (msg)=>{
+      if(!loading) return;
+      if(msg){
+        loading.innerHTML = msg;
+        setTimeout(()=>{ loading.classList.remove('show'); loading.innerHTML = PDF_LOADING_DEFAULT_HTML; }, 1800);
+      } else {
+        loading.classList.remove('show');
+      }
+    };
+    const printFallback = ()=>{
+      finish();
+      area.innerHTML = html;
+      setTimeout(()=>window.print(), 60);
+    };
+    if(typeof html2pdf==='undefined'){ printFallback(); return; }
+
+    // ⚠️ ফাঁকা/PDF-না-তৈরি-হওয়ার আসল কারণ: makeSheet() যে <div class="pdf-sheet"> বানাত, সেটা কখনোই
+    // document-এ appendChild করা হতো না। html2canvas কোনো এলিমেন্ট থেকে ছবি তুলতে হলে সেটা আসল DOM-এ
+    // সংযুক্ত (attached) থাকতে হয় — নাহলে তার width/height ০ ধরে নেয়, ফলে ক্যানভাস সাদা/ফাঁকা আসে বা
+    // ব্যর্থ হয়। এখন শীটটাকে স্ক্রিনের বাইরে (অদৃশ্য, position:fixed;left:-9999px) DOM-এ যোগ করে,
+    // ক্যাপচারের পর সরিয়ে ফেলা হচ্ছে।
+    const makeSheet = ()=>{
+      const host = document.createElement('div');
+      host.style.position = 'fixed';
+      host.style.left = '-9999px';
+      host.style.top = '0';
+      host.style.zIndex = '-1';
+      host.style.pointerEvents = 'none';
+      const el = document.createElement('div');
+      el.className = 'pdf-sheet';
+      el.innerHTML = html;
+      host.appendChild(el);
+      document.body.appendChild(host);
+      return { el, host };
+    };
+    const makeOpt = (scale)=>({
+      margin: 0,
       filename: filename,
       image: {type:'jpeg', quality:0.95},
-      html2canvas: {scale:2, useCORS:true},
-      jsPDF: {unit:'mm', format:'a4', orientation:'portrait'}
+      html2canvas: {scale:scale, useCORS:true, backgroundColor:'#ffffff', scrollX:0, scrollY:0, x:0, y:0, windowWidth:794, logging:false},
+      jsPDF: {unit:'mm', format:'a4', orientation:'portrait'},
+      pagebreak: {mode:[]}
+    });
+    // প্রতিটি পেজ আলাদাভাবে ছবি করে PDF-এ বসানো হয় — তাই বাঁ/ডান দিক কাটা পড়ে না, টেবিলের সারি মাঝখানে ভাঙে না।
+    const buildBlob = async (scale)=>{
+      const pages = await pdfMakePages(html, filename.replace(/\.pdf$/i,''));
+      const opt = makeOpt(scale);
+      const wait = (w, key)=> new Promise((res,rej)=>{ w.get(key).then(res, rej); });
+      const pdf = await wait(html2pdf().set(opt).from(pages[0]).toPdf(), 'pdf');
+      for(let i=1;i<pages.length;i++){
+        const cv = await wait(html2pdf().set(opt).from(pages[i]).toCanvas(), 'canvas');
+        if(pdf.getNumberOfPages() < i+1) pdf.addPage();
+        pdf.setPage(i+1);
+        pdf.addImage(cv.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
+        cv.width = 1; cv.height = 1;
+      }
+      while(pdf.getNumberOfPages() > pages.length) pdf.deletePage(pdf.getNumberOfPages());
+      return pdf.output('blob');
     };
-    const finish = ()=>{ area.classList.remove('capturing'); if(loading) loading.classList.remove('show'); };
-    if(typeof html2pdf==='undefined'){
-      finish();
-      setTimeout(()=>window.print(), 60);
-      return;
-    }
-    html2pdf().set(opt).from(area).save().then(finish).catch(()=>{ finish(); setTimeout(()=>window.print(),60); });
+
+    const prevY = window.scrollY || 0;
+    try{ window.scrollTo(0,0); }catch(e){}
+    // ফোনের WebView-তে বড় ক্যানভাসে মেমরি কম পড়ে ফাঁকা আসতে পারে — তাই APK-তে ছোট স্কেল আগে,
+    // ব্যর্থ হলে আরও ছোট স্কেলে আবার চেষ্টা।
+    const scales = isCapacitor ? [1.5, 1] : [2, 1.2];
+    (async ()=>{
+      let blob = null, lastErr = null;
+      for(const sc of scales){
+        try{
+          blob = await buildBlob(sc);
+          if(blob && blob.size >= 1500) break;
+          lastErr = new Error('PDF blob ফাঁকা/খুব ছোট এসেছে'); blob = null;
+        }catch(e){ lastErr = e; blob = null; }
+      }
+      try{ window.scrollTo(0, prevY); }catch(e){}
+      if(!blob){ throw lastErr || new Error('PDF তৈরি হয়নি'); }
+      if(isCapacitor){
+        const res = await saveOrShareBlob(blob, filename, {shareTitle:'রিপোর্ট সেভ/শেয়ার করুন', mimeType:'application/pdf'});
+        if(res.ok) finish(res.shared ? '✅ PDF তৈরি হয়েছে — সেভ/শেয়ার করুন' : ('✅ PDF সেভ হয়েছে: '+res.locationLabel));
+        else finish('⚠️ PDF সেভ করা যায়নি। আবার চেষ্টা করুন।');
+      } else {
+        await saveOrShareBlob(blob, filename, {mimeType:'application/pdf'});
+        finish();
+      }
+    })().catch((err)=>{
+      try{ window.scrollTo(0, prevY); }catch(e){}
+      console.error('PDF তৈরি ব্যর্থ:', err);
+      if(isCapacitor){ finish('⚠️ PDF তৈরি করা যায়নি। আবার চেষ্টা করুন।'); }
+      else { printFallback(); }
+    });
   }
   document.getElementById('weekReportBtn').addEventListener('click',()=>{
     downloadPdfFile(buildWeekReportHTML(), 'saptahik-report.pdf');
@@ -2483,9 +2789,13 @@
   // Android 13+ এ নোটিফিকেশনের জন্য রানটাইম পারমিশন লাগবে — নিচের কোড সেটা নিজে থেকেই
   // চাইবে (ensureCapacitorPermission)। প্লাগইন ইনস্টল না থাকলেও এই কোড নিরাপদে
   // চুপচাপ কিছু না করে থেমে যাবে (try/catch), ওয়েব ভার্সনে কোনো প্রভাব পড়বে না।
-  const isCapacitor = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform==='function' && window.Capacitor.isNativePlatform());
   const LN = (isCapacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) ? window.Capacitor.Plugins.LocalNotifications : null;
+  // Clock App-এর মতো ফুলস্ক্রিন/লুপ-সাউন্ড এলার্ম — এটা একটা কাস্টম নেটিভ প্লাগইন (SalatAlarm),
+  // যেটা প্রজেক্টে আলাদাভাবে যোগ করতে হয় (Java ফাইল + AndroidManifest এন্ট্রি)। যোগ না করা থাকলে
+  // CapSalatAlarm null থাকবে এবং শুধু সাধারণ নোটিফিকেশনই (LN) কাজ করবে — কোনো ক্র্যাশ হবে না।
+  const CapSalatAlarm = (isCapacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SalatAlarm) ? window.Capacitor.Plugins.SalatAlarm : null;
   const CAP_NOTIF_IDS_KEY = 'wt_cap_notif_ids';
+  const CAP_SALAT_ALARM_IDS_KEY = 'wt_cap_salat_alarm_ids';
   function hashId(str){
     let h = 0;
     for(let i=0;i<str.length;i++){ h = (h*31 + str.charCodeAt(i)) | 0; }
@@ -2536,25 +2846,34 @@
       }
 
       const toSchedule = [];
-      const iso = todayISO();
       const now = new Date();
+      const todayD = new Date();
 
+      // শুধু আজকের কাজ শিডিউল করলে, অ্যাপ না খুললে আগামীকাল/পরশুর রিমাইন্ডার
+      // কখনো OS-এ শিডিউলই হয় না। তাই সামনের ৭ দিনের সময়-নির্ধারিত কাজও
+      // একসাথে শিডিউল করা হচ্ছে — যতবারই অ্যাপ খোলা হবে ততবারই এই উইন্ডো
+      // আবার রিফ্রেশ (রি-শিডিউল) হয়ে যাবে।
+      const TASK_SCHEDULE_DAYS = 7;
       const tp = getNotifPrefs('task');
       if(tp.enabled){
-        getDay(iso).tasks.forEach(t=>{
-          if(!t.time || t.done || !(t.text||'').trim()) return;
-          const at = dueDate(iso, t.time);
-          if(at <= now) return; // আগে চলে যাওয়া সময়, ওয়েব শিডিউলার/গ্রেস ইতিমধ্যে সামলায়
-          toSchedule.push({
-            id: hashId('task|'+iso+'|'+(t.id||t.text)),
-            title: t.text,
-            body: 'কাজের সময় হয়েছে · '+t.time,
-            schedule: { at },
-            smallIcon: 'ic_stat_icon',
-            channelId: 'reminders',
-            extra: { kind:'task', iso, tid: t.id||'' }
+        for(let d=0; d<TASK_SCHEDULE_DAYS; d++){
+          const dayDate = addDays(todayD, d);
+          const iso = toISO(dayDate);
+          getDay(iso).tasks.forEach(t=>{
+            if(!t.time || t.done || !(t.text||'').trim()) return;
+            const at = dueDate(iso, t.time);
+            if(at <= now) return; // আগে চলে যাওয়া সময়, ওয়েব শিডিউলার/গ্রেস ইতিমধ্যে সামলায়
+            toSchedule.push({
+              id: hashId('task|'+iso+'|'+(t.id||t.text)),
+              title: t.text,
+              body: 'কাজের সময় হয়েছে · '+t.time,
+              schedule: { at, allowWhileIdle:true },
+              smallIcon: 'ic_stat_icon',
+              channelId: 'reminders',
+              extra: { kind:'task', iso, tid: t.id||'' }
+            });
           });
-        });
+        }
       }
 
       const sp = getNotifPrefs('salat');
@@ -2576,6 +2895,35 @@
         });
       }
 
+      // ---- Clock App-এর মতো ফুলস্ক্রিন/লুপ-সাউন্ড এলার্ম (শুধু সালাতের সময়ের জন্য) ----
+      // উপরের LN নোটিফিকেশনটা থেকেই যাচ্ছে (ব্যাকআপ হিসেবে — এলার্ম পারমিশন না থাকলে বা কোনো
+      // কারণে ফুলস্ক্রিন অ্যাক্টিভিটি না খুললেও অন্তত সাধারণ নোটিফিকেশনটা দেখা যাবে)।
+      // AlarmManager-ভিত্তিক এলার্ম একবারই ট্রিগার হয় (নিজে থেকে প্রতিদিন রিপিট হয় না), তাই সামনের
+      // কয়েক দিনের জন্য আলাদা আলাদা সময় শিডিউল করা হচ্ছে — অ্যাপ খোলা/resume হলে এই উইন্ডো আবার
+      // রিফ্রেশ (রি-শিডিউল) হয়।
+      if(CapSalatAlarm){
+        try{
+          const prevAlarmIds = JSON.parse(localStorage.getItem(CAP_SALAT_ALARM_IDS_KEY)||'[]');
+          for(const pid of prevAlarmIds){ try{ await CapSalatAlarm.cancel({id: pid}); }catch(e){} }
+        }catch(e){}
+        const newAlarmIds = [];
+        if(sp.enabled){
+          const SALAT_ALARM_DAYS = 3;
+          for(let d=0; d<SALAT_ALARM_DAYS; d++){
+            const iso = toISO(addDays(todayD, d));
+            salat.list.forEach(s=>{
+              if(!s.time || s.off) return;
+              const at = dueDate(iso, s.time).getTime();
+              if(at <= now.getTime()) return;
+              const aid = hashId('salat-alarm|'+iso+'|'+s.id);
+              newAlarmIds.push(aid);
+              CapSalatAlarm.schedule({ id: aid, at, title: s.name+'-এর সময় হয়েছে', body: 'এখন '+s.name+' · '+s.time }).catch(()=>{});
+            });
+          }
+        }
+        try{ localStorage.setItem(CAP_SALAT_ALARM_IDS_KEY, JSON.stringify(newAlarmIds)); }catch(e){}
+      }
+
       if(toSchedule.length){ await LN.schedule({ notifications: toSchedule }); }
       try{ localStorage.setItem(CAP_NOTIF_IDS_KEY, JSON.stringify(toSchedule.map(n=>n.id))); }catch(e){}
     }catch(e){}
@@ -2583,6 +2931,14 @@
   function initCapacitorNotifications(){
     if(!LN) return;
     ensureCapacitorPermission().then(syncCapacitorNotifications);
+    // অ্যাপ ব্যাকগ্রাউন্ড থেকে আবার সামনে এলে (resume) নোটিফিকেশন উইন্ডো রিফ্রেশ করা হয়,
+    // যাতে রোলিং ৭-দিনের শিডিউল সবসময় আপ-টু-ডেট থাকে।
+    try{
+      const CapApp = (window.Capacitor.Plugins && window.Capacitor.Plugins.App) ? window.Capacitor.Plugins.App : null;
+      if(CapApp && CapApp.addListener){
+        CapApp.addListener('appStateChange', (state)=>{ if(state && state.isActive) scheduleCapResync(); });
+      }
+    }catch(e){}
     try{
       LN.addListener('localNotificationActionPerformed', (ev)=>{
         try{
@@ -3217,6 +3573,10 @@
     $('blDate').addEventListener('change',(e)=>setBazarDate(e.target.value));
     $('blToday').addEventListener('click',()=>setBazarDate(todayISO()));
     $('blReport').addEventListener('click',()=>{ closeSheet('listSheet'); openListReport(); });
+    $('blDatePdf').addEventListener('click',()=>{
+      if(!curBz().length){ alert(fmtLong(bazarDate)+' তারিখের বাজার লিস্ট খালি।'); return; }
+      printReport(bazarPdfHTML([bazarDate], fmtLong(bazarDate)), 'bazar-'+bazarDate+'.pdf');
+    });
   })();
 
   // ---------- ঔষধ ----------
@@ -3349,6 +3709,10 @@
     $('expDate').addEventListener('change',(e)=>{ if(e.target.value){ expDate=e.target.value; renderExp(); } });
     $('expToday').addEventListener('click',()=>{ expDate=todayISO(); renderExp(); });
     $('expReportOpen').addEventListener('click',()=>{ closeSheet('expSheet'); openExpReport(); });
+    $('expDatePdf').addEventListener('click',()=>{
+      if(!getExp(expDate).items.some(x=>num(x.amt)>0)){ alert(fmtLong(expDate)+' তারিখে কোনো খরচ লেখা নেই।'); return; }
+      printReport(expensePdfHTML([expDate], fmtLong(expDate), 'day'), 'kharoch-'+expDate+'.pdf');
+    });
     $('expDone').addEventListener('click',()=>closeSheet('expSheet'));
   })();
 
@@ -3372,6 +3736,96 @@
     for(let d=1; d<=n; d++) out.push(y+'-'+pad(m)+'-'+pad(d));
     return out;
   }
+  // ---------- নতুন বিস্তারিত PDF ডিজাইন ----------
+  function pdfHero(title,label,sub){ return `<div class="pdf-hero"><div class="t">${esc(title)}</div><div class="l">${esc(label)}</div><div class="g">${esc(sub)}</div></div>`; }
+  function pdfCards(arr){ return '<div class="pdf-cards">'+arr.map(c=>`<div class="pdf-card"><div class="k">${esc(c.k)}</div><div class="v">${esc(c.v)}</div>${c.s?`<div class="s">${esc(c.s)}</div>`:''}</div>`).join('')+'</div>'; }
+  function pdfSecHead(t,r){ return `<div class="pdf-sec-head"><span class="h-t">${esc(t)}</span><span class="h-r">${esc(r)}</span></div>`; }
+  function pdfGrand(t,v){ return `<div class="pdf-grand"><span>${esc(t)}</span><span>${esc(v)}</span></div>`; }
+  function pdfStamp(){ return 'তৈরির তারিখ: '+fmtLong(todayISO()); }
+
+  function expensePdfHTML(dates, label, mode){
+    const days = []; let total = 0, count = 0, maxItem = null, maxDay = null;
+    dates.forEach(iso=>{
+      const items = getExp(iso).items.filter(x=>num(x.amt)>0);
+      if(!items.length) return;
+      const t = items.reduce((s,x)=>s+num(x.amt),0); total += t; count += items.length;
+      items.forEach(x=>{ if(!maxItem || num(x.amt)>num(maxItem.amt)) maxItem = {text:x.text||'অন্যান্য খরচ', amt:num(x.amt)}; });
+      if(!maxDay || t>maxDay.t) maxDay = {iso:iso, t:t};
+      days.push({iso:iso, items:items, t:t});
+    });
+    const titles = {day:'দৈনিক খরচ রিপোর্ট', week:'সাপ্তাহিক খরচ রিপোর্ট', month:'মাসিক খরচ রিপোর্ট'};
+    let h = pdfHero(titles[mode]||'খরচ রিপোর্ট', label, pdfStamp());
+    if(!days.length) return h + '<div class="pdf-note">এই সময়ে কোনো খরচ লেখা নেই।</div>';
+    if(mode==='day'){
+      h += pdfCards([{k:'মোট খরচ', v:fmtMoney(total)},{k:'মোট খরচের আইটেম', v:String(count)+' টি'},{k:'সবচেয়ে বড় খরচ', v:fmtMoney(maxItem.amt), s:maxItem.text}]);
+    } else {
+      h += pdfCards([{k:'মোট খরচ', v:fmtMoney(total)},{k:'খরচের দিন', v:days.length+' / '+dates.length+' দিন'},{k:'দৈনিক গড় খরচ', v:fmtMoney(total/dates.length), s:'মোট '+dates.length+' দিন ধরে'},{k:'সবচেয়ে বেশি খরচের দিন', v:fmtMoney(maxDay.t), s:fmtShort(fromISO(maxDay.iso))}]);
+      h += '<div class="pdf-sub">📅 দিন অনুযায়ী সারসংক্ষেপ</div><table><tr><th class="c" style="width:38px;">ক্রম</th><th>তারিখ</th><th class="c" style="width:90px;">আইটেম</th><th class="r" style="width:120px;">মোট টাকা</th></tr>'
+        + days.map((d,i)=>`<tr><td class="c">${i+1}</td><td>${esc(fmtLong(d.iso))}</td><td class="c">${d.items.length} টি</td><td class="r nw">${esc(fmtMoney(d.t))}</td></tr>`).join('')
+        + `<tr class="pdf-total"><td colspan="2">সর্বমোট</td><td class="c">${count} টি</td><td class="r nw">${esc(fmtMoney(total))}</td></tr></table>`;
+      h += '<div class="pdf-sub">🧾 প্রতিদিনের বিস্তারিত খরচ</div>';
+    }
+    days.forEach(d=>{
+      h += pdfSecHead(fmtLong(d.iso), 'দিনের মোট: '+fmtMoney(d.t));
+      h += '<table><tr><th class="c" style="width:38px;">ক্রম</th><th>কী কাজে খরচ</th><th class="r" style="width:120px;">টাকা</th><th class="r" style="width:70px;">শতকরা</th></tr>'
+        + d.items.map((x,i)=>`<tr><td class="c">${i+1}</td><td>${esc(x.text||'অন্যান্য খরচ')}</td><td class="r nw">${esc(fmtMoney(x.amt))}</td><td class="r nw">${Math.round(num(x.amt)/d.t*100)}%</td></tr>`).join('')
+        + `<tr class="pdf-total"><td colspan="2">${esc(mode==='day'?'মোট খরচ':'দিনের মোট খরচ')} (${d.items.length} টি আইটেম)</td><td class="r nw">${esc(fmtMoney(d.t))}</td><td class="r">100%</td></tr></table>`;
+    });
+    if(mode!=='day') h += pdfGrand('সর্বমোট খরচ', fmtMoney(total));
+    return h;
+  }
+
+  function bazarDayRows(items){
+    const groups = {}; items.forEach(it=>{ const ci = catIdxOf(it.name); (groups[ci] = groups[ci]||[]).push(it); });
+    let n = 0, h = '';
+    Object.keys(groups).map(Number).sort((a,b)=>a-b).forEach(ci=>{
+      const title = ci===CUSTOM_CI ? 'নিজের আইটেম' : BAZAR_CATS[ci].name;
+      const sub = groups[ci].reduce((s,x)=>s+num(x.price),0);
+      h += `<tr class="pdf-cat"><td colspan="4">${esc(title)} (${groups[ci].length} টি)</td><td class="r nw">${sub>0?esc(fmtMoney(sub)):''}</td></tr>`;
+      groups[ci].forEach(it=>{
+        n++;
+        h += `<tr><td class="c">${n}</td><td>${esc(it.name)}</td><td class="nw">${esc(fmtQty(it.qty))} ${esc(it.unit)}</td><td class="c nw">${it.done?'<span class="ok">✔ কেনা</span>':'<span class="no">☐ বাকি</span>'}</td><td class="r nw">${num(it.price)>0?esc(fmtMoney(it.price)):'—'}</td></tr>`;
+      });
+    });
+    return h;
+  }
+  function bazarPdfHTML(dates, label){
+    const days = []; let total = 0, count = 0, bought = 0, maxItem = null;
+    dates.forEach(iso=>{
+      const items = getBz(iso).items; if(!items.length) return;
+      const t = items.reduce((s,x)=>s+num(x.price),0); const b = items.filter(x=>x.done).length;
+      total += t; count += items.length; bought += b;
+      items.forEach(x=>{ if(num(x.price)>0 && (!maxItem || num(x.price)>num(maxItem.price))) maxItem = x; });
+      days.push({iso:iso, items:items, t:t, b:b});
+    });
+    const single = dates.length===1;
+    let h = pdfHero(single?'বাজার লিস্ট রিপোর্ট':'বাজার লিস্ট রিপোর্ট (একাধিক দিন)', label, pdfStamp());
+    if(!days.length) return h + '<div class="pdf-note">এই সময়ে কোনো বাজারের লিস্ট নেই।</div>';
+    const noPrice = days.reduce((s,d)=>s+d.items.filter(x=>!(num(x.price)>0)).length,0);
+    const cards = [{k:'মোট বাজার খরচ', v:fmtMoney(total)},{k:'মোট পণ্য', v:count+' টি', s:'কেনা হয়েছে '+bought+' টি, বাকি '+(count-bought)+' টি'}];
+    if(single){
+      cards.push({k:'সবচেয়ে দামি পণ্য', v:maxItem?fmtMoney(maxItem.price):'—', s:maxItem?maxItem.name:''});
+    } else {
+      cards.push({k:'বাজারের দিন', v:days.length+' দিন', s:'দিনপ্রতি গড় '+fmtMoney(total/days.length)});
+    }
+    if(noPrice) cards.push({k:'দাম লেখা হয়নি', v:noPrice+' টি'});
+    h += pdfCards(cards);
+    if(!single){
+      h += '<div class="pdf-sub">📅 দিন অনুযায়ী সারসংক্ষেপ</div><table><tr><th class="c" style="width:38px;">ক্রম</th><th>তারিখ</th><th class="c" style="width:70px;">পণ্য</th><th class="c" style="width:80px;">কেনা</th><th class="r" style="width:120px;">মোট দাম</th></tr>'
+        + days.map((d,i)=>`<tr><td class="c">${i+1}</td><td>${esc(fmtLong(d.iso))}</td><td class="c">${d.items.length} টি</td><td class="c">${d.b}/${d.items.length}</td><td class="r nw">${esc(fmtMoney(d.t))}</td></tr>`).join('')
+        + `<tr class="pdf-total"><td colspan="2">সর্বমোট</td><td class="c">${count} টি</td><td class="c">${bought}/${count}</td><td class="r nw">${esc(fmtMoney(total))}</td></tr></table>`;
+      h += '<div class="pdf-sub">🛒 প্রতিদিনের বিস্তারিত পণ্য ও দাম</div>';
+    }
+    days.forEach(d=>{
+      h += pdfSecHead(fmtLong(d.iso), 'মোট দাম: '+fmtMoney(d.t)+' | কেনা '+d.b+'/'+d.items.length);
+      h += '<table><tr><th class="c" style="width:38px;">ক্রম</th><th>পণ্যের নাম</th><th style="width:105px;">পরিমাণ</th><th class="c" style="width:78px;">অবস্থা</th><th class="r" style="width:105px;">দাম</th></tr>'
+        + bazarDayRows(d.items)
+        + `<tr class="pdf-total"><td colspan="4">${single?'মোট বাজার খরচ':'দিনের মোট'} (${d.items.length} টি পণ্য)</td><td class="r nw">${esc(fmtMoney(d.t))}</td></tr></table>`;
+    });
+    if(!single) h += pdfGrand('সর্বমোট বাজার খরচ', fmtMoney(total));
+    return h;
+  }
+
   // -- খরচ রিপোর্ট
   const er = {mode:'day', day:todayISO(), month:todayISO().slice(0,7)};
   function expRange(){
@@ -3410,19 +3864,23 @@
     $('erDay').addEventListener('change',(e)=>{ if(e.target.value){ er.day=e.target.value; renderExpReport(); } });
     $('erMonth').addEventListener('change',(e)=>{ if(e.target.value){ er.month=e.target.value; renderExpReport(); } });
     $('erPdf').addEventListener('click',()=>{
-      const d = expGroups();
-      const titles = {day:'দৈনিক', week:'সাপ্তাহিক', month:'মাসিক'};
-      const extra = er.mode==='day' ? '' : 'দৈনিক গড় খরচ: '+fmtMoney(d.total/d.days);
-      printReport(reportPrintHTML(titles[er.mode]+' খরচ রিপোর্ট', d.label, d.groups, d.total, ['বিবরণ','টাকা'], extra), 'kharoch-report.pdf');
+      const r = expRange();
+      const fname = er.mode==='day' ? 'kharoch-'+er.day+'.pdf' : (er.mode==='week' ? 'kharoch-saptahik-'+er.day+'.pdf' : 'kharoch-mashik-'+er.month+'.pdf');
+      printReport(expensePdfHTML(r.dates, r.label, er.mode), fname);
     });
     $('expReportBtn').addEventListener('click', openExpReport);
   })();
   // -- বাজার লিস্ট রিপোর্ট
-  const lr = {month:'all'};
+  const lr = {month:'all', day:'all'};
   function bzDatesWithItems(){ return storedDates(BZ_PREFIX).filter(iso=>getBz(iso).items.length).sort().reverse(); }
-  function listGroups(){
+  function bzSelectedDates(){
     let dates = bzDatesWithItems();
     if(lr.month!=='all') dates = dates.filter(d=>d.slice(0,7)===lr.month);
+    if(lr.day!=='all') dates = dates.filter(d=>d===lr.day);
+    return dates;
+  }
+  function listGroups(){
+    const dates = bzSelectedDates();
     let total = 0;
     const groups = dates.map(iso=>{
       const items = getBz(iso).items;
@@ -3437,6 +3895,10 @@
     if(lr.month!=='all' && months.indexOf(lr.month)<0) lr.month='all';
     $('lrMonth').innerHTML = '<option value="all">সব সময়</option>'+months.map(m=>{ const p=m.split('-').map(Number); return `<option value="${m}">${MONTH_NAMES[p[1]-1]} ${p[0]}</option>`; }).join('');
     $('lrMonth').value = lr.month;
+    const monthDays = all.filter(d=>lr.month==='all' || d.slice(0,7)===lr.month);
+    if(lr.day!=='all' && monthDays.indexOf(lr.day)<0) lr.day='all';
+    $('lrDay').innerHTML = '<option value="all">সব দিন</option>'+monthDays.map(d=>`<option value="${d}">${esc(fmtLong(d))}</option>`).join('');
+    $('lrDay').value = lr.day;
     const d = listGroups();
     $('lrTotal').textContent = 'মোট খরচ: '+fmtMoney(d.total);
     $('lrBody').innerHTML = groupsScreenHTML(d.groups);
@@ -3444,12 +3906,14 @@
   function openListReport(){ renderListReport(); openSheet('listRepSheet'); }
   (function wireListReport(){
     $('bazarReportBtn').addEventListener('click', openListReport);
-    $('lrMonth').addEventListener('change',(e)=>{ lr.month=e.target.value; renderListReport(); });
+    $('lrMonth').addEventListener('change',(e)=>{ lr.month=e.target.value; lr.day='all'; renderListReport(); });
+    $('lrDay').addEventListener('change',(e)=>{ lr.day=e.target.value; renderListReport(); });
     $('lrPdf').addEventListener('click',()=>{
-      const d = listGroups();
+      const dates = bzSelectedDates();
       let label = 'সব সময়';
-      if(lr.month!=='all'){ const p=lr.month.split('-').map(Number); label = MONTH_NAMES[p[1]-1]+' '+p[0]; }
-      printReport(reportPrintHTML('বাজার লিস্ট রিপোর্ট', label, d.groups, d.total, ['পণ্য','পরিমাণ','দাম'], 'মোট '+d.groups.length+' দিনের লিস্ট'), 'bazar-report.pdf');
+      if(lr.day!=='all') label = fmtLong(lr.day);
+      else if(lr.month!=='all'){ const p=lr.month.split('-').map(Number); label = MONTH_NAMES[p[1]-1]+' '+p[0]; }
+      printReport(bazarPdfHTML(dates, label), lr.day!=='all' ? 'bazar-'+lr.day+'.pdf' : 'bazar-report.pdf');
     });
   })();
 
@@ -3464,11 +3928,9 @@
       if(name==='index.html') blob = new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML], {type:mime});
       else { alert(name+' ফাইলটি এই মুহূর্তে পাওয়া গেল না। ইন্টারনেট চালু করে বা হোস্ট করা লিংক থেকে আবার চেষ্টা করুন।'); return; }
     }
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([blob], {type:mime}));
-    a.download = name;
-    document.body.appendChild(a); a.click();
-    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+    const finalBlob = new Blob([blob], {type:mime});
+    const res = await saveOrShareBlob(finalBlob, name, {shareTitle:'সোর্স ফাইল সেভ/শেয়ার করুন', mimeType:mime});
+    if(isCapacitor && res.ok){ alert(res.shared ? 'ফাইল তৈরি হয়েছে — সেভ/শেয়ার করুন' : 'ফাইল সেভ হয়েছে: '+res.locationLabel); }
   }
   $('dlIndexBtn').addEventListener('click',()=>downloadSource(location.href.split('#')[0].split('?')[0], 'index.html', 'text/html'));
   $('dlSwBtn').addEventListener('click',()=>downloadSource(new URL('sw.js', location.href).href, 'sw.js', 'text/javascript'));
